@@ -1,0 +1,1 @@
+{"lc": 1, "type": "constructor", "id": ["langchain", "prompts", "prompt", "PromptTemplate"], "kwargs": {"input_variables": ["num_sentences", "text"], "template": "Summarize the following text in {num_sentences} sentences:\n\n{text}", "template_format": "f-string"}, "name": "PromptTemplate"}

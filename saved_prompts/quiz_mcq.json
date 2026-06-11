@@ -1,0 +1,19 @@
+{
+  "lc": 1,
+  "type": "constructor",
+  "id": [
+    "langchain",
+    "prompts",
+    "prompt",
+    "PromptTemplate"
+  ],
+  "kwargs": {
+    "input_variables": [
+      "num_questions",
+      "topic"
+    ],
+    "template": "Create {num_questions} MULTIPLE CHOICE quiz questions about: {topic}. Add 4 options (A/B/C/D) and mark the correct answer.",
+    "template_format": "f-string"
+  },
+  "name": "PromptTemplate"
+}

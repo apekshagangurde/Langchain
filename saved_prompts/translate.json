@@ -1,0 +1,1 @@
+{"lc": 1, "type": "constructor", "id": ["langchain", "prompts", "prompt", "PromptTemplate"], "kwargs": {"input_variables": ["language", "text"], "template": "Translate the following text to {language}:\n\n{text}", "template_format": "f-string"}, "name": "PromptTemplate"}
