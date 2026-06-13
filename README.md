@@ -168,6 +168,7 @@ strings to structured Python objects.
 | `output_parsers.py` | Overview of all parser types |
 | `str_parser_compare.py` | `StrOutputParser` — with vs without it |
 | `json_parser.py` | `JsonOutputParser` — get structured dicts from the LLM |
+| `pydantic_parser.py` | `PydanticOutputParser` — validated Pydantic objects from LLM chains |
 
 ---
 
