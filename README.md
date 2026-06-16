@@ -172,6 +172,20 @@ strings to structured Python objects.
 
 ---
 
+## 💧 Step 5.5 — `Runnables/`
+
+**What you learn:** The theory behind what makes LangChain chains work —
+the two types of Runnables and how they differ.
+
+| File | What it teaches |
+|------|----------------|
+| `runnable_types.py` | **Primitive Runnables** (control flow — `RunnableParallel`, `RunnablePassthrough`, `RunnableLambda`, `RunnableBranch`) vs **Task-Specific Runnables** (AI work — prompt templates, chat models, output parsers). Side-by-side comparison table + quick-reference import guide. Theory only — no API calls needed. |
+
+> Read this after finishing `Chains/` — it explains WHY everything connects
+> the way it does with the `|` operator.
+
+---
+
 ## 🌟 Step 6 — `Structured_Output/`
 
 **What you learn:** How to make the LLM return output that exactly matches a
@@ -214,6 +228,7 @@ LangChain models/
 │   └── Simple_Chatbot/         │   Full chatbot with memory
 ├── 🌷 Embedded_Models/         ← Step 4: Text embeddings / vectors
 ├── 🌹 Output_Parsers/          ← Step 5: Parse LLM output (str, JSON)
+├── 💧 Runnables/               ← Step 5.5: Theory — primitive vs task-specific runnables
 ├── 🌟 Structured_Output/       ← Step 6: Schema-enforced structured output
 │
 ├── saved_prompts/              ← Reusable JSON prompt templates
