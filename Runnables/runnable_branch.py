@@ -121,8 +121,12 @@ print("=" * 60)
 print("BONUS — testing the routing logic in isolation")
 print("=" * 60)
 
-is_python = lambda x: "python" in x["question"].lower()
-is_java = lambda x: "java" in x["question"].lower()
+def is_python(x):
+    return "python" in x["question"].lower()
+
+
+def is_java(x):
+    return "java" in x["question"].lower()
 
 for q in ["Explain Python generators", "Explain Java generics", "Explain recursion"]:
     if is_python({"question": q}):
