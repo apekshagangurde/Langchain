@@ -1,0 +1,3 @@
+Project Nimbus is a cloud storage app launched by Nimbus Labs in 2024.
+It offers 50GB of free storage and unlimited storage on the Pro plan.
+The Pro plan costs $9 per month and includes priority customer support.
