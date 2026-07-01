@@ -1,0 +1,11 @@
+Worktree Info
+=============
+
+Path: /Users/apekshagangurde/Desktop/Langchain models/.claude/worktrees/new
+Branch: worktree
+Base commit: ec39020 Add new features and tools to LangChain
+
+Other worktrees in this repo:
+- /Users/apekshagangurde/Desktop/Langchain models (main, commit 239c62c)
+- /Users/apekshagangurde/Desktop/Langchain models/.claude/worktrees/new (worktree, commit ec39020)
+- /Users/apekshagangurde/Desktop/Langchain models/.claude/worktrees/worktress (worktree-worktress, commit ec39020)
