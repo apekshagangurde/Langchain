@@ -16,5 +16,7 @@
 </nav>
 
 <p>Current path: {page.url.pathname}</p>
+<pre>page.params = {JSON.stringify(page.params)}
+page.data   = {JSON.stringify(page.data)}</pre>
 
 {@render children()}
