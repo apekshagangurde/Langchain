@@ -58,8 +58,8 @@ HUGGINGFACEHUB_API_TOKEN=...
 
 **What you learn:** What an LLM is and how to call one directly.
 
-| File | What it teaches |
-|------|----------------|
+| File            | What it teaches                             |
+| --------------- | ------------------------------------------- |
 | `1_llm_demo.py` | Call a basic LLM, understand input → output |
 
 > This is the foundation. An LLM takes text in and gives text back.
@@ -72,13 +72,13 @@ HUGGINGFACEHUB_API_TOKEN=...
 **What you learn:** The difference between a raw LLM and a Chat Model.
 Chat models understand conversation roles (system, human, AI).
 
-| File | What it teaches |
-|------|----------------|
-| `1_chatmodel_openai.py` | ChatGPT via OpenAI API |
-| `2_chatmodel_anthropic.py` | Claude via Anthropic API |
-| `3_chatmodel_google.py` | Gemini via Google API |
-| `4_chatmodle_hf_api.py` | HuggingFace models via cloud API |
-| `5_chatmodel_hf_local.py` | Run a HuggingFace model on your own machine |
+| File                       | What it teaches                             |
+| -------------------------- | ------------------------------------------- |
+| `1_chatmodel_openai.py`    | ChatGPT via OpenAI API                      |
+| `2_chatmodel_anthropic.py` | Claude via Anthropic API                    |
+| `3_chatmodel_google.py`    | Gemini via Google API                       |
+| `4_chatmodle_hf_api.py`    | HuggingFace models via cloud API            |
+| `5_chatmodel_hf_local.py`  | Run a HuggingFace model on your own machine |
 
 > **Tip for beginners:** Start with `1_chatmodel_openai.py` or
 > `3_chatmodel_google.py` — both have generous free tiers.
@@ -94,8 +94,8 @@ The core of this repo. Work through the sub-folders **in order**.
 **What you learn:** The three message types LangChain uses — SystemMessage,
 HumanMessage, AIMessage — and why roles matter in a conversation.
 
-| File | What it teaches |
-|------|----------------|
+| File                | What it teaches                              |
+| ------------------- | -------------------------------------------- |
 | `about_messages.py` | Message types, how to construct and use them |
 
 ---
@@ -105,15 +105,15 @@ HumanMessage, AIMessage — and why roles matter in a conversation.
 **What you learn:** How to build reusable, dynamic prompts instead of
 hardcoding strings.
 
-| File | What it teaches |
-|------|----------------|
-| `1_what_is_prompt_template.py` | Basic PromptTemplate — fill in variables |
-| `2_chat_prompt_template.py` | ChatPromptTemplate for multi-turn prompts |
-| `3_partial_templates.py` | Pre-fill some variables, leave others open |
-| `4_few_shot_prompting.py` | Give the LLM examples to follow |
-| `5_messages_placeholder.py` | Inject conversation history into a prompt |
-| `6_advanced_dynamic_prompt.py` | Build prompts that change based on logic |
-| `7_save_and_load_template.py` | Save a prompt to a file and reload it |
+| File                           | What it teaches                            |
+| ------------------------------ | ------------------------------------------ |
+| `1_what_is_prompt_template.py` | Basic PromptTemplate — fill in variables   |
+| `2_chat_prompt_template.py`    | ChatPromptTemplate for multi-turn prompts  |
+| `3_partial_templates.py`       | Pre-fill some variables, leave others open |
+| `4_few_shot_prompting.py`      | Give the LLM examples to follow            |
+| `5_messages_placeholder.py`    | Inject conversation history into a prompt  |
+| `6_advanced_dynamic_prompt.py` | Build prompts that change based on logic   |
+| `7_save_and_load_template.py`  | Save a prompt to a file and reload it      |
 
 ---
 
@@ -122,15 +122,15 @@ hardcoding strings.
 **What you learn:** How to connect prompts, models, and parsers together into
 a pipeline using the `|` operator (LCEL — LangChain Expression Language).
 
-| File | What it teaches |
-|------|----------------|
-| `1_what_is_a_chain.py` | What a chain is — the core idea |
-| `2_simple_chain_deep_dive.py` | Deep dive into how one chain step works |
-| `3_sequential_chain.py` | Run steps one after another |
-| `4_parallel_chain.py` | Run multiple steps at the same time |
-| `5_runnable_lambda_passthrough.py` | Transform data mid-chain |
-| `6_branching_conditional_chain.py` | Branch the chain based on input |
-| `7_real_world_chain.py` | A realistic end-to-end example |
+| File                               | What it teaches                         |
+| ---------------------------------- | --------------------------------------- |
+| `1_what_is_a_chain.py`             | What a chain is — the core idea         |
+| `2_simple_chain_deep_dive.py`      | Deep dive into how one chain step works |
+| `3_sequential_chain.py`            | Run steps one after another             |
+| `4_parallel_chain.py`              | Run multiple steps at the same time     |
+| `5_runnable_lambda_passthrough.py` | Transform data mid-chain                |
+| `6_branching_conditional_chain.py` | Branch the chain based on input         |
+| `7_real_world_chain.py`            | A realistic end-to-end example          |
 
 ---
 
@@ -139,8 +139,8 @@ a pipeline using the `|` operator (LCEL — LangChain Expression Language).
 **What you learn:** Put everything together — build an interactive chatbot
 that remembers the conversation history.
 
-| File | What it teaches |
-|------|----------------|
+| File         | What it teaches                 |
+| ------------ | ------------------------------- |
 | `chatbot.py` | A full chatbot loop with memory |
 
 ---
@@ -151,10 +151,10 @@ that remembers the conversation history.
 This is the foundation for search, similarity, and RAG (Retrieval-Augmented
 Generation).
 
-| File | What it teaches |
-|------|----------------|
-| `1_embedding_openai_query.py` | Generate embeddings with OpenAI |
-| `2.emdedding_hf_local.py` | Generate embeddings locally with HuggingFace |
+| File                          | What it teaches                              |
+| ----------------------------- | -------------------------------------------- |
+| `1_embedding_openai_query.py` | Generate embeddings with OpenAI              |
+| `2.emdedding_hf_local.py`     | Generate embeddings locally with HuggingFace |
 
 ---
 
@@ -163,12 +163,12 @@ Generation).
 **What you learn:** How to control and parse the LLM's output — from raw
 strings to structured Python objects.
 
-| File | What it teaches |
-|------|----------------|
-| `output_parsers.py` | Overview of all parser types |
-| `str_parser_compare.py` | `StrOutputParser` — with vs without it |
-| `json_parser.py` | `JsonOutputParser` — get structured dicts from the LLM |
-| `pydantic_parser.py` | `PydanticOutputParser` — validated Pydantic objects from LLM chains |
+| File                    | What it teaches                                                     |
+| ----------------------- | ------------------------------------------------------------------- |
+| `output_parsers.py`     | Overview of all parser types                                        |
+| `str_parser_compare.py` | `StrOutputParser` — with vs without it                              |
+| `json_parser.py`        | `JsonOutputParser` — get structured dicts from the LLM              |
+| `pydantic_parser.py`    | `PydanticOutputParser` — validated Pydantic objects from LLM chains |
 
 ---
 
@@ -177,8 +177,8 @@ strings to structured Python objects.
 **What you learn:** The theory behind what makes LangChain chains work —
 the two types of Runnables and how they differ.
 
-| File | What it teaches |
-|------|----------------|
+| File                | What it teaches                                                                                                                                                                                                                                                                                                   |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `runnable_types.py` | **Primitive Runnables** (control flow — `RunnableParallel`, `RunnablePassthrough`, `RunnableLambda`, `RunnableBranch`) vs **Task-Specific Runnables** (AI work — prompt templates, chat models, output parsers). Side-by-side comparison table + quick-reference import guide. Theory only — no API calls needed. |
 
 > Read this after finishing `Chains/` — it explains WHY everything connects
@@ -191,8 +191,8 @@ the two types of Runnables and how they differ.
 **What you learn:** How to make the LLM return output that exactly matches a
 Pydantic schema — the most reliable way to get structured data.
 
-| File | What it teaches |
-|------|----------------|
+| File                   | What it teaches                                       |
+| ---------------------- | ----------------------------------------------------- |
 | `structured_output.py` | `.with_structured_output()` — schema-enforced replies |
 
 ---
@@ -203,14 +203,14 @@ Pre-built prompt templates saved as JSON files. These are ready to load and
 reuse in your own projects. See `7_save_and_load_template.py` in
 `Prompt_Templates/` for how to load them.
 
-| File | Purpose |
-|------|---------|
-| `explain_beginner.json` | Explain a concept to a beginner |
-| `explain_template.json` | General explanation template |
-| `quiz.json` | Generate quiz questions |
-| `quiz_mcq.json` | Generate multiple-choice quiz questions |
-| `summarize.json` | Summarize a piece of text |
-| `translate.json` | Translate text to another language |
+| File                    | Purpose                                 |
+| ----------------------- | --------------------------------------- |
+| `explain_beginner.json` | Explain a concept to a beginner         |
+| `explain_template.json` | General explanation template            |
+| `quiz.json`             | Generate quiz questions                 |
+| `quiz_mcq.json`         | Generate multiple-choice quiz questions |
+| `summarize.json`        | Summarize a piece of text               |
+| `translate.json`        | Translate text to another language      |
 
 ---
 
@@ -262,4 +262,4 @@ echo "GROQ_API_KEY=your_key_here" >> .env
 python LLMs/1_llm_demo.py
 ```
 
-Then follow the learning path from Step 1 to Step 6. Happy learning! 🌸
+Then follow the learning path from Step 1 to Step 6. Happy learning!
