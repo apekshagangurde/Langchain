@@ -18,5 +18,6 @@
 <p>Current path: {page.url.pathname}</p>
 <pre>page.params = {JSON.stringify(page.params)}
 page.data   = {JSON.stringify(page.data)}</pre>
+<p>Request ID (from hooks.server.ts via locals): {page.data.requestId}</p>
 
 {@render children()}
