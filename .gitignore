@@ -24,6 +24,13 @@ D:/
 *.pt
 *.pth
 
+# SQLite databases (LangGraph checkpointer state)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
 # Jupyter
 .ipynb_checkpoints/
 
