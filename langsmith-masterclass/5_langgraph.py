@@ -1,4 +1,4 @@
-# pip install -U langgraph langchain-openai pydantic python-dotenv langsmith
+# pip install -U langgraph langchain-groq pydantic python-dotenv langsmith
 
 import operator
 from typing import TypedDict, Annotated, List
@@ -7,17 +7,21 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
 from langsmith import traceable
-from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
 from langgraph.graph import StateGraph, START, END
+import os
 
+os.environ["LANGCHAIN_PROJECT"] = "langgraph chatbot"
 # ---------- Setup ----------
 load_dotenv()
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+model = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)
+
 
 # ---------- Structured schema & model ----------
 class EvaluationSchema(BaseModel):
     feedback: str = Field(description="Detailed feedback for the essay")
     score: int = Field(description="Score out of 10", ge=0, le=10)
+
 
 structured_model = model.with_structured_output(EvaluationSchema)
 
@@ -41,6 +45,7 @@ If India use AI good way, we become strong, help poor and make better life. But 
 So, in short, AI time in India have many hope and many danger. We must go right road. AI must help all people, not only some. Then India grow big and world say "good job India".
 """
 
+
 # ---------- LangGraph state ----------
 class UPSCState(TypedDict, total=False):
     essay: str
@@ -51,8 +56,13 @@ class UPSCState(TypedDict, total=False):
     individual_scores: Annotated[List[int], operator.add]  # merges parallel lists
     avg_score: float
 
+
 # ---------- Traced node functions ----------
-@traceable(name="evaluate_language_fn", tags=["dimension:language"], metadata={"dimension": "language"})
+@traceable(
+    name="evaluate_language_fn",
+    tags=["dimension:language"],
+    metadata={"dimension": "language"},
+)
 def evaluate_language(state: UPSCState):
     prompt = (
         "Evaluate the language quality of the following essay and provide feedback "
@@ -61,7 +71,12 @@ def evaluate_language(state: UPSCState):
     out = structured_model.invoke(prompt)
     return {"language_feedback": out.feedback, "individual_scores": [out.score]}
 
-@traceable(name="evaluate_analysis_fn", tags=["dimension:analysis"], metadata={"dimension": "analysis"})
+
+@traceable(
+    name="evaluate_analysis_fn",
+    tags=["dimension:analysis"],
+    metadata={"dimension": "analysis"},
+)
 def evaluate_analysis(state: UPSCState):
     prompt = (
         "Evaluate the depth of analysis of the following essay and provide feedback "
@@ -70,7 +85,12 @@ def evaluate_analysis(state: UPSCState):
     out = structured_model.invoke(prompt)
     return {"analysis_feedback": out.feedback, "individual_scores": [out.score]}
 
-@traceable(name="evaluate_thought_fn", tags=["dimension:clarity"], metadata={"dimension": "clarity_of_thought"})
+
+@traceable(
+    name="evaluate_thought_fn",
+    tags=["dimension:clarity"],
+    metadata={"dimension": "clarity_of_thought"},
+)
 def evaluate_thought(state: UPSCState):
     prompt = (
         "Evaluate the clarity of thought of the following essay and provide feedback "
@@ -79,18 +99,20 @@ def evaluate_thought(state: UPSCState):
     out = structured_model.invoke(prompt)
     return {"clarity_feedback": out.feedback, "individual_scores": [out.score]}
 
+
 @traceable(name="final_evaluation_fn", tags=["aggregate"])
 def final_evaluation(state: UPSCState):
     prompt = (
         "Based on the following feedback, create a summarized overall feedback.\n\n"
-        f"Language feedback: {state.get('language_feedback','')}\n"
-        f"Depth of analysis feedback: {state.get('analysis_feedback','')}\n"
-        f"Clarity of thought feedback: {state.get('clarity_feedback','')}\n"
+        f"Language feedback: {state.get('language_feedback', '')}\n"
+        f"Depth of analysis feedback: {state.get('analysis_feedback', '')}\n"
+        f"Clarity of thought feedback: {state.get('clarity_feedback', '')}\n"
     )
     overall = model.invoke(prompt).content
     scores = state.get("individual_scores", []) or []
     avg = (sum(scores) / len(scores)) if scores else 0.0
     return {"overall_feedback": overall, "avg_score": avg}
+
 
 # ---------- Build graph ----------
 graph = StateGraph(UPSCState)
@@ -120,7 +142,7 @@ if __name__ == "__main__":
             "tags": ["essay", "langgraph", "evaluation"],
             "metadata": {
                 "essay_length": len(essay2),
-                "model": "gpt-4o-mini",
+                "model": "llama-3.3-70b-versatile",
                 "dimensions": ["language", "analysis", "clarity"],
             },
         },
