@@ -31,6 +31,10 @@ D:/
 *.sqlite
 *.sqlite3
 
+# Pickle files
+*.pickle
+*.pkl
+
 # Jupyter
 .ipynb_checkpoints/
 
