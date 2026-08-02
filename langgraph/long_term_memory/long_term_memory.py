@@ -33,6 +33,39 @@
 #    context window for the current call, so the model actually uses
 #    them when generating its response.
 
+# Store (LangGraph): the built-in persistence layer LangGraph provides
+# for long-term memory — memories are organized by a namespace (a tuple
+# like (user_id, "memories")) plus a key, so they can be scoped per
+# user/application and looked up across threads. It's the long-term
+# counterpart to the checkpointer, which only persists state within a
+# single thread.
+
+# BaseStore: the abstract interface every store implements, exposing
+# the CRUD operations a memory system needs:
+# - create: `put(namespace, key, value)` writes a brand-new memory.
+# - search: `search(namespace, query=...)` finds memories relevant to a
+#   query (semantic search and/or filters) instead of loading everything
+#   that was ever stored.
+# - edit: calling `put` again with the SAME namespace + key overwrites
+#   that memory in place — how an existing memory gets updated.
+# - delete: `delete(namespace, key)` removes a memory outright.
+
+# InMemoryStore: a `BaseStore` implementation that keeps everything in
+# the running process's memory — fast, dependency-free, great for
+# prototyping/local dev, but NOT persistent: memories are lost on
+# process restart and aren't shared across separate processes.
+
+# PostgresStore: a `BaseStore` implementation backed by a real Postgres
+# database — memories survive restarts and are shared across processes/
+# deployments, making it the practical choice for production long-term
+# memory (at the cost of needing a Postgres instance to run against).
+
+# RedisStore: a `BaseStore` implementation backed by Redis — also
+# persistent and shared across processes like PostgresStore, but
+# trades Postgres's relational/query features for Redis's speed,
+# making it a good fit when memory reads/writes need to be very low
+# latency (e.g. high-traffic production agents already using Redis).
+
 # Challenges:
 #
 # 1. Deciding what's worth remembering: there's no clean rule for which
