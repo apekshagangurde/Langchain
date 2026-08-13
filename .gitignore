@@ -16,6 +16,10 @@ venv/
 env/
 .venv/
 
+# uv
+uv.lock
+.python-version
+
 # HuggingFace / model cache
 D:/
 *.bin
