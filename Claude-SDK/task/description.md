@@ -40,3 +40,13 @@ An agent that debugs code and raises a PR using the GitHub MCP server.
 8. **Putting it together**
    - System prompt that encodes the debug → fix → verify → PR workflow
    - Reading the final `ResultMessage` to confirm success/failure and surface the PR link
+
+## Implementation
+
+See `agent.py`. Fill in `.env` (`GITHUB_PERSONAL_ACCESS_TOKEN`, `REPO_PATH`,
+`BUG_DESCRIPTION`), make sure Docker is running, then:
+
+```bash
+cd "/Users/apekshagangurde/Desktop/Langchain models/Claude-SDK"
+uv run task/agent.py
+```
