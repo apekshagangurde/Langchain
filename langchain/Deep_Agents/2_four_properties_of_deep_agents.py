@@ -72,6 +72,7 @@ from deepagents import SubAgent, create_deep_agent
 from dotenv import load_dotenv
 from langchain.agents.middleware import TodoListMiddleware
 from langchain.tools import tool
+from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain_groq import ChatGroq
 
 load_dotenv()
@@ -79,7 +80,15 @@ load_dotenv()
 # The main agent plans, delegates and writes files at once, so it gets the larger
 # model. Small models degenerate when asked to emit long free-text tool arguments
 # (the file contents), which surfaces as a Groq "tool_use_failed" error.
-model = ChatGroq(model="openai/gpt-oss-120b")
+#
+# The rate limiter is not optional on Groq's free tier: a deep agent resends its
+# long prompt plus history every turn and runs subagents on top, which blows past
+# 8,000 tokens/minute and 429s. This paces it to ~1 request per 25 seconds, so
+# expect the demo to take a few minutes. Drop it if you are on a paid tier.
+model = ChatGroq(
+    model="openai/gpt-oss-120b",
+    rate_limiter=InMemoryRateLimiter(requests_per_second=0.04, check_every_n_seconds=0.5),
+)
 
 
 @tool

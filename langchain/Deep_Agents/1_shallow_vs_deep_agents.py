@@ -126,6 +126,7 @@ from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain.agents.middleware import TodoListMiddleware
 from langchain.tools import tool
+from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain_groq import ChatGroq
 
 load_dotenv()
@@ -138,7 +139,15 @@ def get_population(city: str) -> str:
     return data.get(city.lower(), f"No population data for {city}")
 
 
-model = ChatGroq(model="openai/gpt-oss-120b")
+# Deep agents are token-hungry: the built-in prompt plus the growing history is
+# resent on every turn, and each subagent is a full agent loop of its own. On
+# Groq's free tier (8,000 tokens/minute) that hits a 429 within a few steps, so
+# the model is paced to roughly one request every 25 seconds.
+# Drop the rate limiter if you are on a paid tier.
+model = ChatGroq(
+    model="openai/gpt-oss-120b",
+    rate_limiter=InMemoryRateLimiter(requests_per_second=0.04, check_every_n_seconds=0.5),
+)
 
 TASK = "Compare Pune and Mumbai for someone relocating, and recommend one."
 
