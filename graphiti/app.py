@@ -8,6 +8,7 @@ argv. The search logic is imported rather than duplicated.
 """
 
 import asyncio
+import os
 import threading
 
 import streamlit as st
@@ -55,11 +56,74 @@ def run(coro):
 
 loop, graphiti = get_client()
 
+DEFAULT_GRAPH = os.getenv("FALKORDB_DATABASE", "graphiti")
+
+
+@st.cache_data(ttl=30)
+def list_graphs() -> list[tuple[str, int]]:
+    """(graph name, entity count) for every graph, biggest first.
+
+    ingest_markdown.py --group-id writes to a graph of that name, so this is
+    the list of ingested documents plus the default graph.
+
+    The counts are the point: querying a deleted FalkorDB graph recreates it
+    as an empty shell, so the list alone will happily offer you a graph with
+    nothing in it. Cached briefly so a running ingest shows up.
+    """
+
+    async def fetch() -> list[tuple[str, int]]:
+        client = graphiti.driver.client
+        # default_db is FalkorDB's own bookkeeping graph, not one of ours.
+        names = [n for n in await client.list_graphs() if n != "default_db"]
+        out = []
+        for name in names:
+            try:
+                result = await client.select_graph(name).query(
+                    "MATCH (e:Entity) RETURN count(e)"
+                )
+                out.append((name, int(result.result_set[0][0])))
+            except Exception:
+                out.append((name, 0))
+        return out
+
+    try:
+        graphs = run(fetch())
+    except Exception:
+        return [(DEFAULT_GRAPH, 0)]
+
+    if not graphs:
+        return [(DEFAULT_GRAPH, 0)]
+    # Biggest first, so the graph you just filled is at the top.
+    return sorted(graphs, key=lambda pair: (-pair[1], pair[0]))
+
 st.title("🔎 Graphiti search")
-st.caption("Searches the knowledge graph in FalkorDB. Run `add_episodes.py` first.")
+caption = st.empty()  # filled in once the graph is chosen, below
 
 with st.sidebar:
     st.header("Options")
+
+    graphs = list_graphs()
+    counts = dict(graphs)
+    labels = [f"{name}  ({count} entities)" for name, count in graphs]
+
+    # Open on the fullest graph. FALKORDB_DATABASE is not a useful default
+    # here: it points at the starter graph from add_episodes.py, so an
+    # ingested document would sit unsearched while the app answered from
+    # three toy episodes.
+    choice = st.selectbox(
+        "Graph",
+        labels,
+        index=0,
+        help=(
+            "On FalkorDB each group_id is a separate graph, so an ingest run "
+            "with `--group-id kabil` is only searchable here by picking "
+            "`kabil`. Searching a different graph finds nothing from it."
+        ),
+    )
+    group = graphs[labels.index(choice)][0]
+
+    if not counts.get(group):
+        st.warning(f"`{group}` is empty. Nothing to search in it yet.")
     recipe = st.selectbox(
         "Search mode",
         ["facts", *RECIPES],
@@ -99,7 +163,12 @@ with st.sidebar:
     if focus and recipe != "facts":
         st.info("Node distance reranking only applies in **facts** mode.")
 
-query = st.text_input("Query", placeholder="who works at Dalgo?")
+caption.caption(
+    f"Searching the **{group}** graph in FalkorDB "
+    f"({counts.get(group, 0)} entities)."
+)
+
+query = st.text_input("Query", placeholder="what do you know about KABIL?")
 go = st.button("Search", type="primary")
 
 if go or query:
@@ -107,10 +176,13 @@ if go or query:
         st.warning("Type a query first.")
         st.stop()
 
+    # None for the driver's own default graph; a one-element list otherwise.
+    group_ids = None if group == DEFAULT_GRAPH else [group]
+
     center_uuid = None
     if focus.strip():
         with st.spinner(f'Looking up "{focus}"...'):
-            node, by_name = run(find_focal_node(graphiti, focus.strip()))
+            node, by_name = run(find_focal_node(graphiti, focus.strip(), group_ids))
         if node is None:
             st.warning("The graph has no entities. Run `add_episodes.py` first.")
         elif by_name:
@@ -128,14 +200,19 @@ if go or query:
         if recipe == "facts":
             edges = run(
                 graphiti.search(
-                    query=query, center_node_uuid=center_uuid, num_results=limit
+                    query=query,
+                    center_node_uuid=center_uuid,
+                    num_results=limit,
+                    group_ids=group_ids,
                 )
             )
             results = None
         else:
             config = RECIPES[recipe].model_copy(deep=True)
             config.limit = limit
-            results = run(graphiti.search_(query=query, config=config))
+            results = run(
+                graphiti.search_(query=query, config=config, group_ids=group_ids)
+            )
             edges = results.edges
 
     # What the LLM is allowed to use. Node summaries count as context in
@@ -152,7 +229,10 @@ if go or query:
                 citation[node.uuid] = len(context)
 
     if not context:
-        st.info("No results found. Try a broader query, or run `add_episodes.py`.")
+        st.info(
+            f"No results in the **{group}** graph. "
+            "If your data was ingested under a different --group-id, pick it above."
+        )
         st.stop()
 
     if narrate:

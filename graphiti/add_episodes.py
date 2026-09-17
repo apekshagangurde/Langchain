@@ -84,12 +84,18 @@ class LocalReranker(CrossEncoderClient):
         )
 
 
-def make_graphiti() -> Graphiti:
+def make_graphiti(database: str | None = None) -> Graphiti:
+    """Build the Graphiti client. `database` overrides FALKORDB_DATABASE.
+
+    On FalkorDB a group_id is a separate graph, not a filter, so writing to
+    one means pointing the driver at that graph -- otherwise
+    build_indices_and_constraints() builds its indices on the wrong graph.
+    """
     return Graphiti(
         graph_driver=FalkorDriver(
             host=os.getenv("FALKORDB_HOST", "localhost"),
             port=int(os.getenv("FALKORDB_PORT", "6379")),
-            database=os.getenv("FALKORDB_DATABASE", "graphiti"),
+            database=database or os.getenv("FALKORDB_DATABASE", "graphiti"),
         ),
         llm_client=GroqClient(
             config=LLMConfig(

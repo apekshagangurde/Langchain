@@ -102,7 +102,7 @@ async def answer_from_facts(query: str, facts: list[str], model: str | None = No
     return text.replace("\u3010", "[").replace("\u3011", "]")
 
 
-async def find_focal_node(graphiti, name: str):
+async def find_focal_node(graphiti, name: str, group_ids: list[str] | None = None):
     """Resolve a name like "Jane" to an entity node, for center_node_uuid.
 
     search() takes a uuid, not a name, so this is the lookup step. Returns
@@ -115,7 +115,9 @@ async def find_focal_node(graphiti, name: str):
     Returns (node, matched_by_name). matched_by_name is False when the name
     hit nothing and this fell back to the nearest semantic neighbour.
     """
-    results = await graphiti.search_(query=name, config=NODE_HYBRID_SEARCH_RRF)
+    results = await graphiti.search_(
+        query=name, config=NODE_HYBRID_SEARCH_RRF, group_ids=group_ids
+    )
     if not results.nodes:
         return None, False
 
