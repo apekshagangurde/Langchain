@@ -24,6 +24,7 @@ Three search approaches are shown:
 
 import argparse
 import asyncio
+import os
 
 # Imported for its side effects too: loads .env and pins EMBEDDING_DIM before
 # graphiti_core is imported. make_graphiti() wires up Groq + the local
@@ -53,6 +54,52 @@ RECIPES = {
     "nodes": NODE_HYBRID_SEARCH_RRF,
     "all": COMBINED_HYBRID_SEARCH_RRF,
 }
+
+# Grounding rules matter more than tone here: the graph holds a handful of
+# extracted facts, so the model must not fill gaps from its own knowledge.
+ANSWER_SYSTEM_PROMPT = """You answer questions using ONLY the numbered facts \
+supplied by the user. These facts come from a knowledge graph.
+
+Rules:
+- Use only the given facts. Never add outside knowledge or guess.
+- If the facts do not answer the question, say exactly what is missing and \
+cite nothing.
+- Cite each fact you actually used as [1], [2]. Do not cite facts you did \
+not use.
+- Answer in two or three sentences of plain prose. No preamble, no bullet \
+lists, no restating the question."""
+
+
+async def answer_from_facts(query: str, facts: list[str], model: str | None = None) -> str:
+    """Turn retrieved graph facts into a natural-language answer via Groq.
+
+    Graphiti's own GroqClient is not reused: it forces
+    response_format={'type': 'json_object'} and json.loads() the reply, so it
+    cannot return prose. This talks to the same Groq account and model.
+    """
+    if not facts:
+        return "Nothing in the graph matches that query, so there is nothing to answer from."
+
+    from groq import AsyncGroq
+
+    client = AsyncGroq(api_key=os.environ["GROQ_API_KEY"])
+    numbered = "\n".join(f"{i}. {fact}" for i, fact in enumerate(facts, start=1))
+
+    response = await client.chat.completions.create(
+        model=model or os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"),
+        messages=[
+            {"role": "system", "content": ANSWER_SYSTEM_PROMPT},
+            {"role": "user", "content": f"Facts:\n{numbered}\n\nQuestion: {query}"},
+        ],
+        temperature=0.2,  # low: this is grounded summarisation, not writing
+        max_tokens=500,
+    )
+    text = (response.choices[0].message.content or "").strip()
+
+    # gpt-oss-120b emits full-width citation brackets regardless of what the
+    # prompt asks for, and Streamlit renders them literally. Normalise here
+    # rather than trying to prompt it away.
+    return text.replace("\u3010", "[").replace("\u3011", "]")
 
 
 async def find_focal_node(graphiti, name: str):
