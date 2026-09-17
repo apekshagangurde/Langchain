@@ -1,0 +1,18 @@
+services:
+  falkordb:
+    image: falkordb/falkordb:latest
+    container_name: graphiti-falkordb
+    ports:
+      - "6379:6379"   # graph database (Redis protocol) — what connect.py talks to
+      - "3000:3000"   # FalkorDB Browser UI — http://localhost:3000
+    volumes:
+      - ./falkordb_data:/var/lib/falkordb/data
+    environment:
+      # Persist to disk: snapshot after 60s if >=1 key changed, and append-only log
+      REDIS_ARGS: "--save 60 1 --appendonly yes"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
