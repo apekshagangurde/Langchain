@@ -1,0 +1,39 @@
+# api.py as a container, for Vercel (or anything else that runs an image).
+# No database in here: Neo4j is Aura, reached over NEO4J_URI.
+#
+#   docker build -f Dockerfile.vercel -t graphiti-api .
+#   docker run --rm -p 8000:80 --env-file .env graphiti-api
+#
+# Secrets come from the environment at run time -- .env is in .dockerignore
+# and never lands in the image.
+FROM python:3.13-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    # Models are baked in below; never reach the Hub at run time.
+    HF_HOME=/opt/hf \
+    HF_HUB_OFFLINE=1 \
+    TRANSFORMERS_OFFLINE=1 \
+    EMBEDDING_DIM=384
+
+WORKDIR /app
+
+# CPU-only torch first: the default wheel bundles CUDA, several GB this
+# container would never use. sentence-transformers then finds torch installed.
+RUN pip install torch --index-url https://download.pytorch.org/whl/cpu
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# Download the embedder and reranker at build time, so a cold start loads them
+# from disk instead of the network. Names must match add_episodes.py.
+RUN HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0 python -c "\
+from sentence_transformers import SentenceTransformer, CrossEncoder; \
+SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2'); \
+CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')"
+
+COPY . .
+
+# Vercel routes traffic to $PORT, 80 when unset.
+CMD ["sh", "-c", "exec uvicorn api:app --host 0.0.0.0 --port ${PORT:-80}"]

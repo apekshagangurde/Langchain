@@ -1,0 +1,13 @@
+# Secrets come from the environment at run time, never the image.
+.env
+.env.*
+.git
+__pycache__
+data
+falkordb_data
+docker-compose.yml
+*.md
+# Only the API and its client module go in.
+*.py
+!api.py
+!add_episodes.py

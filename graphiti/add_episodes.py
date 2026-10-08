@@ -25,7 +25,9 @@ os.environ.setdefault("EMBEDDING_DIM", "384")
 from graphiti_core import Graphiti  # noqa: E402
 from graphiti_core.cross_encoder.client import CrossEncoderClient  # noqa: E402
 from graphiti_core.driver.falkordb_driver import FalkorDriver  # noqa: E402
+from graphiti_core.driver.neo4j_driver import Neo4jDriver  # noqa: E402
 from graphiti_core.embedder.client import EmbedderClient, EmbedderConfig  # noqa: E402
+from graphiti_core.llm_client.anthropic_client import AnthropicClient  # noqa: E402
 from graphiti_core.llm_client.config import LLMConfig  # noqa: E402
 from graphiti_core.llm_client.groq_client import GroqClient  # noqa: E402
 from graphiti_core.nodes import EpisodeType  # noqa: E402
@@ -84,7 +86,66 @@ class LocalReranker(CrossEncoderClient):
         )
 
 
-def make_graphiti(database: str | None = None) -> Graphiti:
+DEFAULT_BACKEND = os.getenv("GRAPH_BACKEND", "falkordb")
+
+
+def groups_are_graphs(backend: str) -> bool:
+    """On FalkorDB a group_id is its own graph; on Neo4j it is a node property."""
+    return backend == "falkordb"
+
+
+def make_driver(database: str | None = None, backend: str = DEFAULT_BACKEND):
+    if backend == "neo4j":
+        # `database` is ignored: every group lives in the one Neo4j database.
+        return Neo4jDriver(
+            uri=os.environ["NEO4J_URI"],
+            user=os.environ["NEO4J_USER"],
+            password=os.environ["NEO4J_PASSWORD"],
+            database=os.getenv("NEO4J_DATABASE", "neo4j"),
+        )
+    if backend == "falkordb":
+        return FalkorDriver(
+            host=os.getenv("FALKORDB_HOST", "localhost"),
+            port=int(os.getenv("FALKORDB_PORT", "6379")),
+            database=database or os.getenv("FALKORDB_DATABASE", "graphiti"),
+        )
+    raise ValueError(f"GRAPH_BACKEND must be falkordb or neo4j, got {backend!r}")
+
+
+def make_llm():
+    """Claude when ANTHROPIC_API_KEY is set, otherwise Groq."""
+    if os.getenv("ANTHROPIC_API_KEY"):
+        llm = AnthropicClient(
+            config=LLMConfig(
+                api_key=os.environ["ANTHROPIC_API_KEY"],
+                model=os.getenv("ANTHROPIC_MODEL", "claude-opus-5-5"),
+            )
+        )
+        # graphiti_core's request shape predates current Claude models:
+        # `temperature` is rejected, and so is forced tool_choice on
+        # Opus 5.5 / Sonnet 5.5. With a single tool offered, `auto` still
+        # gets the tool call back.
+        create = llm.client.messages.create
+
+        async def create_compat(**kwargs):
+            kwargs.pop("temperature", None)
+            if kwargs.get("tool_choice", {}).get("type") in ("tool", "any"):
+                kwargs["tool_choice"] = {"type": "auto"}
+            return await create(**kwargs)
+
+        llm.client.messages.create = create_compat
+        return llm
+    return GroqClient(
+        config=LLMConfig(
+            api_key=os.environ["GROQ_API_KEY"],
+            model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
+        )
+    )
+
+
+def make_graphiti(
+    database: str | None = None, backend: str = DEFAULT_BACKEND
+) -> Graphiti:
     """Build the Graphiti client. `database` overrides FALKORDB_DATABASE.
 
     On FalkorDB a group_id is a separate graph, not a filter, so writing to
@@ -92,19 +153,29 @@ def make_graphiti(database: str | None = None) -> Graphiti:
     build_indices_and_constraints() builds its indices on the wrong graph.
     """
     return Graphiti(
-        graph_driver=FalkorDriver(
-            host=os.getenv("FALKORDB_HOST", "localhost"),
-            port=int(os.getenv("FALKORDB_PORT", "6379")),
-            database=database or os.getenv("FALKORDB_DATABASE", "graphiti"),
-        ),
-        llm_client=GroqClient(
-            config=LLMConfig(
-                api_key=os.environ["GROQ_API_KEY"],
-                model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
-            )
-        ),
+        graph_driver=make_driver(database, backend),
+        llm_client=make_llm(),
         embedder=LocalEmbedder(),
         cross_encoder=LocalReranker(),
+    )
+
+
+async def add_episode(
+    graphiti: Graphiti,
+    text: str,
+    *,
+    name: str,
+    source_description: str,
+    group_id: str | None = None,
+):
+    await graphiti.build_indices_and_constraints()  # idempotent
+    return await graphiti.add_episode(
+        name=name,
+        episode_body=text,
+        source=EpisodeType.text,
+        source_description=source_description,
+        reference_time=datetime.now(timezone.utc),
+        group_id=group_id,
     )
 
 

@@ -1,3 +1,4 @@
 .env
 falkordb_data/
 __pycache__/
+!.env.example
