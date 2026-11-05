@@ -49,10 +49,11 @@ edit, grep, glob, ...) can be used as a backend.
 from pathlib import Path
 
 from deepagents import create_deep_agent
-from deepagents.backends import FilesystemBackend, StateBackend
+from deepagents.backends import FilesystemBackend, StateBackend, StoreBackend
 from dotenv import load_dotenv
 from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain_groq import ChatGroq
+from langgraph.store.memory import InMemoryStore
 
 load_dotenv()
 
@@ -83,6 +84,27 @@ fs_agent = create_deep_agent(
     model=model,
     backend=FilesystemBackend(root_dir=ROOT_DIR, virtual_mode=True),
     system_prompt="You are a note-taking assistant. Save notes with `write_file`.",
+)
+
+
+# ---------------------------------------------------------------------------
+# SIMPLE EXAMPLE: StoreBackend
+# Files go into a LangGraph Store, so they PERSIST across conversations.
+# StateBackend forgets files when the conversation ends; StoreBackend does not.
+# With StoreBackend + InMemoryStore, the file is not saved to disk at all. It
+# lives in RAM, inside the InMemoryStore object, as an entry keyed under the
+# namespace.
+#   - store:     where files are kept. InMemoryStore lives only while this
+#                script runs; in production use a database-backed store
+#                (e.g. PostgresStore) so files survive restarts too.
+#   - namespace: a folder-like key that groups the files, e.g. per user.
+# ---------------------------------------------------------------------------
+store = InMemoryStore()
+
+store_agent = create_deep_agent(
+    model=model,
+    backend=StoreBackend(store=store, namespace=lambda _runtime: ("notes",)),
+    system_prompt="You are a note-taking assistant. Save and read notes with your file tools.",
 )
 
 if __name__ == "__main__":
@@ -126,3 +148,34 @@ if __name__ == "__main__":
         if file_path.is_file():
             print(f"--- {file_path.relative_to(ROOT_DIR)} ---")
             print(file_path.read_text())
+
+    print("\n" + "=" * 20, "StoreBackend", "=" * 20)
+    # Conversation 1: save a note.
+    store_agent.invoke(
+        {
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Save a 2-line note about Delhi to /notes/delhi.md, then say done.",
+                }
+            ]
+        }
+    )
+
+    # Conversation 2: a brand-new conversation with no history. It can still
+    # read the note, because the file lives in the store, not in the chat state.
+    store_result = store_agent.invoke(
+        {
+            "messages": [
+                {"role": "user", "content": "Read /notes/delhi.md and tell me what it says."}
+            ]
+        }
+    )
+
+    print("Agent reply (new conversation):", store_result["messages"][-1].content)
+
+    # Files written by the agent live in the store under the "notes" namespace.
+    print("\nFiles in store:")
+    for item in store.search(("notes",)):
+        print(f"--- {item.key} ---")
+        print(item.value["content"])
