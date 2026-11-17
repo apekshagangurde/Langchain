@@ -2,8 +2,7 @@
 TripMate — the deep agent
 =========================
 
-Smallest working version: one deep agent + one tool (get_weather).
-Run it, check the answer, then add the next tool.
+Deep agent with two tools: get_weather, get_places.
 
     python agent.py
 """
@@ -16,7 +15,7 @@ from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain_groq import ChatGroq
 
 from prompts import TRIPMATE_SYSTEM_PROMPT
-from tools import get_weather
+from tools import get_places, get_weather
 
 load_dotenv(Path(__file__).parent / ".env")  # project1/.env with GROQ_API_KEY
 
@@ -29,20 +28,20 @@ model = ChatGroq(
 
 agent = create_deep_agent(
     model=model,
-    tools=[get_weather],
+    tools=[get_weather, get_places],
     system_prompt=TRIPMATE_SYSTEM_PROMPT,
 )
 
 
 if __name__ == "__main__":
-    # Test: the agent should call get_weather for each city and compare.
+    # Test: get_weather for both cities, pick one, then get_places for it.
     result = agent.invoke(
         {
             "messages": [
                 {
                     "role": "user",
-                    "content": "What's the weather this weekend in Lonavala and Mahabaleshwar? "
-                    "Which one is better for sightseeing?",
+                    "content": "Compare this weekend's weather in Lonavala and Mahabaleshwar, "
+                    "pick the better one for sightseeing, and tell me what places to visit there.",
                 }
             ]
         }

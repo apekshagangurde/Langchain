@@ -4,6 +4,13 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-17 — Step 3: second tool
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Added `get_places` to `tools.py`.
+- Added `get_places` to the agent in `agent.py`.
+
 ## 2026-11-17 — Step 2: smallest working agent + first tool
 
 **Branch:** `deep-agents-project1` · **Status:** committed
