@@ -1,0 +1,5 @@
+# langgraph dev local data (checkpoints, store .pckl files)
+.langgraph_api/
+
+# personal long-term memory
+memories/

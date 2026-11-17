@@ -4,6 +4,14 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-17 — LangGraph Studio
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Added `langgraph.json` to run TripMate with `langgraph dev`.
+- Added `.gitignore` for `.langgraph_api/` and `memories/`.
+- Added "Run in LangGraph Studio" to `README.md`.
+
 ## 2026-11-17 — Step 8: Streamlit UI
 
 **Branch:** `deep-agents-project1` · **Status:** committed

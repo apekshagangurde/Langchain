@@ -145,6 +145,23 @@ python patterns.py   # the six orchestration patterns one by one
 streamlit run app.py # chat UI in the browser (http://localhost:8501)
 ```
 
+### Run in LangGraph Studio (`langgraph dev`)
+
+`langgraph.json` tells `langgraph dev` which graph to serve (`tripmate` →
+`agent.py:agent`) and loads `project1/.env`. Needs `pip install "langgraph-cli[inmem]"`.
+
+```bash
+cd langchain/Deep_Agents/project1
+langgraph dev
+```
+
+It opens LangGraph Studio in your browser. Pick the `tripmate` graph and send a
+message, for example
+`{"role": "user", "content": "Plan a 2-day trip to Mahabaleshwar, budget ₹8,000"}`.
+The local API runs at http://localhost:2024. Studio shows each step live, and
+the todo list appears in the state panel. Local run data goes to
+`.langgraph_api/` (git-ignored).
+
 Model: Anthropic Claude Opus 5.5 via `ChatAnthropic(model="claude-opus-5-5")`
 (`langchain-anthropic`). Don't pass `temperature`; this model rejects it.
 
