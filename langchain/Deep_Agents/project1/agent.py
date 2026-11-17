@@ -3,7 +3,7 @@ TripMate — the deep agent
 =========================
 
 Deep agent with:
-- two tools: get_weather , search_places (Tavily web search)
+- two tools: get_weather (Open-Meteo forecast), search_places (Tavily web search)
 - a todo list (TodoListMiddleware -> write_todos) for planning
 - skills from project1/skills/ (e.g. itinerary-writer), read only when needed
 

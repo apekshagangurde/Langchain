@@ -4,6 +4,13 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-17 — Step 7: real weather
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Replaced the fake `get_weather` in `tools.py` with a real Open-Meteo forecast (no API key).
+- Added a `get_weather` rule to the prompt in `prompts.py`.
+
 ## 2026-11-17 — Step 6: Tavily place search
 
 **Branch:** `deep-agents-project1` · **Status:** committed

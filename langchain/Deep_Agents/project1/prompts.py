@@ -47,6 +47,10 @@ simple day-by-day itinerary.
 - Only open a skill when the current step needs it.
 
 ## Rules
+- Get the forecast with `get_weather` for the trip dates (pass `country_code`,
+  e.g. "IN"). Check the returned place name is the right town. If it says not
+  found, do NOT guess another spelling: stop and ask the user for the correct
+  town name.
 - Find places with `search_places` (pass the user's interests if known). Only
   recommend places that appear in its results.
 - Only suggest cities you have data for; never invent prices or weather.

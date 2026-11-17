@@ -121,7 +121,7 @@ project1/
 ├── prompts.py               ← step 1: TripMate system prompt
 ├── plan/
 │   └── CHANGELOG.md         ← what changed in each step
-├── tools.py                 ← tools: get_weather, search_places (Tavily web search)
+├── tools.py                 ← tools: get_weather (Open-Meteo), search_places (Tavily web search)
 ├── subagents.py             ← subagent specs (weather, places, budget, critic)
 ├── agent.py                 ← the main TripMate deep agent (all concepts)
 ├── patterns.py              ← the six orchestration patterns
