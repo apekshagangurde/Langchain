@@ -3,7 +3,7 @@ TripMate — the deep agent
 =========================
 
 Deep agent with:
-- two tools: get_weather, get_places
+- two tools: get_weather , search_places (Tavily web search)
 - a todo list (TodoListMiddleware -> write_todos) for planning
 - skills from project1/skills/ (e.g. itinerary-writer), read only when needed
 
@@ -20,10 +20,10 @@ from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain_groq import ChatGroq
 
 from prompts import TRIPMATE_SYSTEM_PROMPT
-from tools import get_places, get_weather
+from tools import get_weather, search_places
 
 PROJECT_DIR = Path(__file__).parent
-load_dotenv(PROJECT_DIR / ".env")  # project1/.env with GROQ_API_KEY
+load_dotenv(PROJECT_DIR / ".env")  # project1/.env with GROQ_API_KEY, TAVILY_API_KEY
 
 # Groq for now (Anthropic key not working yet).
 # Rate limiter keeps us under Groq's free-tier tokens/minute cap.
@@ -46,7 +46,7 @@ backend = CompositeBackend(
 
 agent = create_deep_agent(
     model=model,
-    tools=[get_weather, get_places],
+    tools=[get_weather, search_places],
     middleware=[
         TodoListMiddleware()
     ],  # adds the write_todos tool (not default in deepagents 0.7.x)
@@ -57,7 +57,7 @@ agent = create_deep_agent(
 
 
 if __name__ == "__main__":
-    # Test: get_weather for both cities, pick one, then get_places for it.
+    # Test: get_weather for both cities, pick one, then search_places for it.
     result = agent.invoke(
         {
             "messages": [

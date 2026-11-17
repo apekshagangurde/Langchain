@@ -4,6 +4,15 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-17 — Step 6: Tavily place search
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Added `search_places` (Tavily web search) to `tools.py`; removed `get_places`.
+- Switched the agent in `agent.py` to `search_places`.
+- Added a `search_places` rule to the prompt in `prompts.py`.
+- Installed `langchain-tavily`; `TAVILY_API_KEY` goes in `project1/.env`.
+
 ## 2026-11-17 — Step 5: skills
 
 **Branch:** `deep-agents-project1` · **Status:** committed

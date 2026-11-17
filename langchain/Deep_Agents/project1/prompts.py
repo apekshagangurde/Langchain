@@ -47,6 +47,8 @@ simple day-by-day itinerary.
 - Only open a skill when the current step needs it.
 
 ## Rules
+- Find places with `search_places` (pass the user's interests if known). Only
+  recommend places that appear in its results.
 - Only suggest cities you have data for; never invent prices or weather.
 - If no city fits the budget, say so and suggest the cheapest option.
 
