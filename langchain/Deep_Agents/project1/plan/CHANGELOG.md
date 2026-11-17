@@ -4,6 +4,13 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-17 — Step 4: planning (todo list)
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Added `TodoListMiddleware` to the agent in `agent.py`; it prints the final todo list.
+- Added a `## Planning` section to the prompt in `prompts.py`.
+
 ## 2026-11-17 — Step 3: second tool
 
 **Branch:** `deep-agents-project1` · **Status:** committed
