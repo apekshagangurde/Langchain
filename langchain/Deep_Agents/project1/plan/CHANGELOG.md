@@ -4,6 +4,12 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-17 — Step 8: Streamlit UI
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Added `app.py`: chat UI that sends prompts to the agent and shows the reply, tool calls and todo list.
+
 ## 2026-11-17 — Step 7: real weather
 
 **Branch:** `deep-agents-project1` · **Status:** committed
