@@ -4,6 +4,14 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-17 — Step 5: skills
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Added `skills/itinerary-writer/SKILL.md`.
+- Added a `CompositeBackend` and `skills=["/skills/"]` to the agent in `agent.py`.
+- Added a `## Skills` section to the prompt in `prompts.py`; `## Output` now uses the skill's format.
+
 ## 2026-11-17 — Step 4: planning (todo list)
 
 **Branch:** `deep-agents-project1` · **Status:** committed

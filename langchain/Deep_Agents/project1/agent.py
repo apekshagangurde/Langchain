@@ -2,8 +2,10 @@
 TripMate — the deep agent
 =========================
 
-Deep agent with two tools (get_weather, get_places) and a todo list
-(TodoListMiddleware -> write_todos) for planning.
+Deep agent with:
+- two tools: get_weather, get_places
+- a todo list (TodoListMiddleware -> write_todos) for planning
+- skills from project1/skills/ (e.g. itinerary-writer), read only when needed
 
     python agent.py
 """
@@ -11,6 +13,7 @@ Deep agent with two tools (get_weather, get_places) and a todo list
 from pathlib import Path
 
 from deepagents import create_deep_agent
+from deepagents.backends import CompositeBackend, FilesystemBackend, StateBackend
 from dotenv import load_dotenv
 from langchain.agents.middleware import TodoListMiddleware
 from langchain_core.rate_limiters import InMemoryRateLimiter
@@ -19,7 +22,8 @@ from langchain_groq import ChatGroq
 from prompts import TRIPMATE_SYSTEM_PROMPT
 from tools import get_places, get_weather
 
-load_dotenv(Path(__file__).parent / ".env")  # project1/.env with GROQ_API_KEY
+PROJECT_DIR = Path(__file__).parent
+load_dotenv(PROJECT_DIR / ".env")  # project1/.env with GROQ_API_KEY
 
 # Groq for now (Anthropic key not working yet).
 # Rate limiter keeps us under Groq's free-tier tokens/minute cap.
@@ -30,12 +34,24 @@ model = ChatGroq(
     ),
 )
 
+
+backend = CompositeBackend(
+    default=StateBackend(),
+    routes={
+        "/skills/": FilesystemBackend(
+            root_dir=PROJECT_DIR / "skills", virtual_mode=True
+        )
+    },
+)
+
 agent = create_deep_agent(
     model=model,
     tools=[get_weather, get_places],
     middleware=[
         TodoListMiddleware()
     ],  # adds the write_todos tool (not default in deepagents 0.7.x)
+    backend=backend,
+    skills=["/skills/"],
     system_prompt=TRIPMATE_SYSTEM_PROMPT,
 )
 
