@@ -118,7 +118,9 @@ and an orchestrator that hands work to subagents.
 ```
 project1/
 ├── README.md                ← you are here
-├── prompts.py               ← step 1: TripMate system prompt (all concepts)
+├── prompts.py               ← step 1: TripMate system prompt
+├── plan/
+│   └── CHANGELOG.md         ← what changed in each step
 ├── tools.py                 ← fake tools: weather, places, costs, book_hotel
 ├── subagents.py             ← subagent specs (weather, places, budget, critic)
 ├── agent.py                 ← the main TripMate deep agent (all concepts)
