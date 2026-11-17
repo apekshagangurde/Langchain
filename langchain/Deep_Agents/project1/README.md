@@ -90,7 +90,7 @@ engineering) and **have to be built into TripMate**, on top of rows 1–10.
 | Interpreters / dynamic subagents | beta; overkill for a learning project                           |
 | Multimodal                   | no images/audio in a trip planner (could add "upload a photo of a place" later) |
 | Harness profiles             | only needed to tweak per-model defaults                            |
-| Prompt caching middleware    | no-op for Groq models                                              |
+| Prompt caching middleware    | nothing to set up: deepagents adds `AnthropicPromptCachingMiddleware` automatically for Claude |
 | Managed Deep Agents / Agent Server / ACP | deployment topics, not agent design                     |
 
 ---
@@ -138,15 +138,15 @@ project1/
 ## How to run
 
 ```bash
-# from the repo root, with the venv active and GROQ_API_KEY in .env
+# with the venv active and ANTHROPIC_API_KEY in project1/.env
 cd langchain/Deep_Agents/project1
 python agent.py      # full deep agent demo (memory, subagents, skills, HITL)
 python patterns.py   # the six orchestration patterns one by one
 streamlit run app.py # chat UI in the browser (http://localhost:8501)
 ```
 
-Model: `ChatGroq(model="openai/gpt-oss-120b")` with a rate limiter to stay
-under Groq's free-tier tokens/minute limit. Runs are slow on purpose.
+Model: Anthropic Claude Opus 5.5 via `ChatAnthropic(model="claude-opus-5-5")`
+(`langchain-anthropic`). Don't pass `temperature`; this model rejects it.
 
 ---
 

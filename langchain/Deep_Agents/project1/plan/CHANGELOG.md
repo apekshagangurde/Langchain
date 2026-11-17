@@ -4,6 +4,14 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-17 — Step 2: smallest working agent + first tool
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Added `tools.py` with `get_weather`.
+- Added `agent.py`: deep agent with Groq (`openai/gpt-oss-120b`) and `get_weather`.
+- Added `project1/.env` (git-ignored) for API keys.
+
 ## 2026-11-17 — Step 1: system prompt + tracking folder
 
 **Branch:** `deep-agents-project1` · **Status:** committed
