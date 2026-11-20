@@ -6,7 +6,8 @@ Deep agent with:
 - two tools: get_weather (Open-Meteo forecast), search_places (Tavily web search)
 - a todo list (TodoListMiddleware -> write_todos) for planning
 - skills from project1/skills/ (e.g. itinerary-writer), read only when needed
-- build_agent(checkpointer=...) for short-term memory (used by app.py)
+- build_agent(checkpointer=..., store=...) for short- and long-term memory (used by app.py)
+- long-term memory: files under /memories/ are saved in the store, shared across threads
 
     python agent.py
 """
@@ -14,7 +15,12 @@ Deep agent with:
 from pathlib import Path
 
 from deepagents import create_deep_agent
-from deepagents.backends import CompositeBackend, FilesystemBackend, StateBackend
+from deepagents.backends import (
+    CompositeBackend,
+    FilesystemBackend,
+    StateBackend,
+    StoreBackend,
+)
 from dotenv import load_dotenv
 from langchain.agents.middleware import TodoListMiddleware
 
@@ -35,13 +41,21 @@ backend = CompositeBackend(
     routes={
         "/skills/": FilesystemBackend(
             root_dir=PROJECT_DIR / "skills", virtual_mode=True
-        )
+        ),
+        # Long-term memory: files under /memories/ go to the LangGraph store,
+        # so they survive across threads (new chats). Everything else stays per-thread.
+        # One shared namespace for now; per-user comes with runtime context (E2).
+        "/memories/": StoreBackend(namespace=lambda _rt: ("tripmate", "memories")),
     },
 )
 
 
-def build_agent(checkpointer=None):
-    """Build TripMate. Pass a checkpointer to give it short-term memory."""
+def build_agent(checkpointer=None, store=None):
+    """Build TripMate.
+
+    checkpointer -> short-term memory (one chat thread)
+    store        -> long-term memory (/memories/, shared across threads)
+    """
     return create_deep_agent(
         model=model,
         tools=[get_weather, search_places],
@@ -52,11 +66,12 @@ def build_agent(checkpointer=None):
         skills=["/skills/"],
         system_prompt=TRIPMATE_SYSTEM_PROMPT,
         checkpointer=checkpointer,
+        store=store,
     )
 
 
 # For LangGraph Studio (langgraph.json -> agent.py:agent).
-# No checkpointer here: `langgraph dev` adds its own and errors if we pass one.
+# No checkpointer or store here: `langgraph dev` adds its own and errors if we pass one.
 agent = build_agent()
 
 

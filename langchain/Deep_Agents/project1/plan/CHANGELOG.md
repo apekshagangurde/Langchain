@@ -4,6 +4,15 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-20 — A2: long-term memory
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Added `/memories/` → `StoreBackend` route and a `store` argument to `build_agent` in `agent.py`.
+- Updated `app.py` to pass `InMemoryStore()`.
+- Added a `## Memory` section to `prompts.py`.
+- Updated the Studio note in `README.md`.
+
 ## 2026-11-20 — A1: short-term memory
 
 **Branch:** `deep-agents-project1` · **Status:** committed

@@ -9,20 +9,23 @@ the agent made and its todo list.
 
 Memory: the agent has a checkpointer, so it remembers the chat by thread_id.
 We only send the new message; "New chat" starts a new thread_id.
+Long-term facts saved under /memories/ are kept across chats (until restart).
 """
 
 import uuid
 
 import streamlit as st
 from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.store.memory import InMemoryStore
 
 from agent import build_agent
 
 
 @st.cache_resource
 def get_agent():
-    # Built once and kept across Streamlit reruns, so the saved chats survive.
-    return build_agent(checkpointer=InMemorySaver())
+    # Built once and kept across Streamlit reruns, so saved chats and memories survive.
+    # InMemorySaver = per-chat history; InMemoryStore = /memories/ shared by all chats.
+    return build_agent(checkpointer=InMemorySaver(), store=InMemoryStore())
 
 
 agent = get_agent()
