@@ -159,7 +159,10 @@ It opens LangGraph Studio in your browser. Pick the `tripmate` graph and send a
 message, for example
 `{"role": "user", "content": "Plan a 2-day trip to Mahabaleshwar, budget ₹8,000"}`.
 The local API runs at http://localhost:2024. Studio shows each step live, and
-the todo list appears in the state panel. Local run data goes to
+the todo list appears in the state panel. Studio adds its own short-term
+memory per thread, so `agent.py:agent` is built *without* a checkpointer
+(`langgraph dev` errors if you pass one); `python agent.py` and `app.py` use
+`build_agent(checkpointer=InMemorySaver())`. Local run data goes to
 `.langgraph_api/` (git-ignored).
 
 ### Choosing the model

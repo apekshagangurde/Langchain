@@ -6,22 +6,42 @@ TripMate — small Streamlit chat UI
 
 Type a prompt, get TripMate's answer. Each reply also shows the tool calls
 the agent made and its todo list.
+
+Memory: the agent has a checkpointer, so it remembers the chat by thread_id.
+We only send the new message; "New chat" starts a new thread_id.
 """
 
-import streamlit as st
+import uuid
 
-from agent import agent
+import streamlit as st
+from langgraph.checkpoint.memory import InMemorySaver
+
+from agent import build_agent
+
+
+@st.cache_resource
+def get_agent():
+    # Built once and kept across Streamlit reruns, so the saved chats survive.
+    return build_agent(checkpointer=InMemorySaver())
+
+
+agent = get_agent()
 
 st.set_page_config(page_title="TripMate", page_icon="🧳")
 st.title("🧳 TripMate")
 st.caption("Weekend-trip planner — a deep agent with real weather and place search.")
 
 if "messages" not in st.session_state:
-    st.session_state.messages = []  # [{"role": "user"|"assistant", "content": str}]
+    st.session_state.messages = []  # only for showing the chat on screen
+if "thread_id" not in st.session_state:
+    st.session_state.thread_id = str(uuid.uuid4())
 
 if st.sidebar.button("New chat"):
     st.session_state.messages = []
+    st.session_state.thread_id = str(uuid.uuid4())  # fresh memory
     st.rerun()
+
+st.sidebar.caption(f"Thread: `{st.session_state.thread_id[:8]}`")
 
 # Show the conversation so far.
 for msg in st.session_state.messages:
@@ -37,8 +57,11 @@ if prompt:
     with st.chat_message("assistant"):
         try:
             with st.spinner("Planning... (rate-limited, can take a minute)"):
-                # Send the whole chat so the agent remembers earlier turns.
-                result = agent.invoke({"messages": st.session_state.messages})
+                # Send only the new message; the checkpointer remembers earlier turns.
+                config = {"configurable": {"thread_id": st.session_state.thread_id}}
+                result = agent.invoke(
+                    {"messages": [{"role": "user", "content": prompt}]}, config=config
+                )
         except Exception as e:  # bad API key, network, rate limit, ...
             st.error(f"Agent failed: {e}")
             st.stop()
@@ -46,10 +69,13 @@ if prompt:
         answer = result["messages"][-1].content
         st.markdown(answer)
 
-        # What happened behind the scenes.
+        # What happened behind the scenes — this turn only.
+        # result["messages"] holds the whole thread, so start after the last user message.
+        msgs = result["messages"]
+        last_user = max(i for i, m in enumerate(msgs) if m.type == "human")
         tool_calls = [
             call
-            for m in result["messages"]
+            for m in msgs[last_user + 1 :]
             for call in (getattr(m, "tool_calls", None) or [])
         ]
         with st.expander(f"Tool calls ({len(tool_calls)})"):

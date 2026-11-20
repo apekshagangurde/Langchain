@@ -6,6 +6,7 @@ Deep agent with:
 - two tools: get_weather (Open-Meteo forecast), search_places (Tavily web search)
 - a todo list (TodoListMiddleware -> write_todos) for planning
 - skills from project1/skills/ (e.g. itinerary-writer), read only when needed
+- build_agent(checkpointer=...) for short-term memory (used by app.py)
 
     python agent.py
 """
@@ -38,16 +39,25 @@ backend = CompositeBackend(
     },
 )
 
-agent = create_deep_agent(
-    model=model,
-    tools=[get_weather, search_places],
-    middleware=[
-        TodoListMiddleware()
-    ],  # adds the write_todos tool (not default in deepagents 0.7.x)
-    backend=backend,
-    skills=["/skills/"],
-    system_prompt=TRIPMATE_SYSTEM_PROMPT,
-)
+
+def build_agent(checkpointer=None):
+    """Build TripMate. Pass a checkpointer to give it short-term memory."""
+    return create_deep_agent(
+        model=model,
+        tools=[get_weather, search_places],
+        middleware=[
+            TodoListMiddleware()
+        ],  # adds the write_todos tool (not default in deepagents 0.7.x)
+        backend=backend,
+        skills=["/skills/"],
+        system_prompt=TRIPMATE_SYSTEM_PROMPT,
+        checkpointer=checkpointer,
+    )
+
+
+# For LangGraph Studio (langgraph.json -> agent.py:agent).
+# No checkpointer here: `langgraph dev` adds its own and errors if we pass one.
+agent = build_agent()
 
 
 if __name__ == "__main__":

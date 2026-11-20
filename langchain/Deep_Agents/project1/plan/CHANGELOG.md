@@ -4,6 +4,14 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-20 — A1: short-term memory
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Added `build_agent(checkpointer=None)` to `agent.py`.
+- Updated `app.py` to use `InMemorySaver` + a per-chat `thread_id`.
+- Added a Studio memory note to `README.md`.
+
 ## 2026-11-20 — Model-agnostic setup
 
 **Branch:** `deep-agents-project1` · **Status:** committed
