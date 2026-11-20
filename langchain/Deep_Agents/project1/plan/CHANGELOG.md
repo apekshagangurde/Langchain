@@ -4,6 +4,14 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-20 — Model-agnostic setup
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Added `llm.py`: `get_model()` picks the model from `TRIPMATE_MODEL` in `.env`.
+- Updated `agent.py` to use `get_model()` instead of `ChatGroq`.
+- Added "Choosing the model" to `README.md`.
+
 ## 2026-11-17 — LangGraph Studio
 
 **Branch:** `deep-agents-project1` · **Status:** committed

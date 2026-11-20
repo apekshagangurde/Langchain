@@ -16,23 +16,17 @@ from deepagents import create_deep_agent
 from deepagents.backends import CompositeBackend, FilesystemBackend, StateBackend
 from dotenv import load_dotenv
 from langchain.agents.middleware import TodoListMiddleware
-from langchain_core.rate_limiters import InMemoryRateLimiter
-from langchain_groq import ChatGroq
 
+from llm import get_model
 from prompts import TRIPMATE_SYSTEM_PROMPT
 from tools import get_weather, search_places
 
 PROJECT_DIR = Path(__file__).parent
-load_dotenv(PROJECT_DIR / ".env")  # project1/.env with GROQ_API_KEY, TAVILY_API_KEY
+load_dotenv(PROJECT_DIR / ".env")  # API keys + TRIPMATE_MODEL
 
-# Groq for now (Anthropic key not working yet).
-# Rate limiter keeps us under Groq's free-tier tokens/minute cap.
-model = ChatGroq(
-    model="openai/gpt-oss-120b",
-    rate_limiter=InMemoryRateLimiter(
-        requests_per_second=0.04, check_every_n_seconds=0.5
-    ),
-)
+# Model comes from TRIPMATE_MODEL in .env (default: Groq gpt-oss-120b).
+# To switch to Claude: TRIPMATE_MODEL=anthropic:claude-opus-5-5
+model = get_model()
 
 
 backend = CompositeBackend(

@@ -138,7 +138,7 @@ project1/
 ## How to run
 
 ```bash
-# with the venv active and ANTHROPIC_API_KEY in project1/.env
+# with the venv active and the model's API key in project1/.env (see "Choosing the model")
 cd langchain/Deep_Agents/project1
 python agent.py      # full deep agent demo (memory, subagents, skills, HITL)
 python patterns.py   # the six orchestration patterns one by one
@@ -162,8 +162,18 @@ The local API runs at http://localhost:2024. Studio shows each step live, and
 the todo list appears in the state panel. Local run data goes to
 `.langgraph_api/` (git-ignored).
 
-Model: Anthropic Claude Opus 5.5 via `ChatAnthropic(model="claude-opus-5-5")`
-(`langchain-anthropic`). Don't pass `temperature`; this model rejects it.
+### Choosing the model
+
+The model is set in one place, `TRIPMATE_MODEL` in `project1/.env`
+(read by `llm.py` through `init_chat_model`):
+
+```bash
+TRIPMATE_MODEL=groq:openai/gpt-oss-120b     # default, needs GROQ_API_KEY
+TRIPMATE_MODEL=anthropic:claude-opus-5-5    # Claude, needs ANTHROPIC_API_KEY
+```
+
+Groq gets a rate limiter for its free-tier cap. No `temperature` is passed,
+because Claude Opus 5.5 rejects it.
 
 ---
 
