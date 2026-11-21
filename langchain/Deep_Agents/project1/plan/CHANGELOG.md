@@ -4,6 +4,13 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-21 — C1: budget-planner skill
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Added `skills/budget-planner/SKILL.md` (cost split, typical prices, output table).
+- Gave `budget-agent` `skills=["/skills/"]` in `subagents.py` and told it to follow the skill.
+
 ## 2026-11-21 — B2–B5: more subagents + delegation prompt
 
 **Branch:** `deep-agents-project1` · **Status:** committed

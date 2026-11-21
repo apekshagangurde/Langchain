@@ -18,7 +18,7 @@ Fields (deepagents SubAgent):
 
     weather-agent  get_weather     forecast + "better for sightseeing" verdict
     places-agent   search_places   short list of places to visit
-    budget-agent   (none)          cost split for city + days + budget
+    budget-agent   (none)          cost split via the budget-planner skill
     critic-agent   (none)          reviews the draft itinerary -> "ok" or fixes
 """
 
@@ -72,16 +72,16 @@ BUDGET_AGENT = {
         "fits. Use it after the destination is chosen and before writing the plan."
     ),
     "system_prompt": """\
-You are TripMate's budget estimator. You have no tools: use typical mid-range
-Indian prices and label every number as an estimate.
+You are TripMate's budget estimator. You have no search tools.
 
+- FIRST read the `budget-planner` skill and follow it (split, prices, output).
 - Read from the task: home city, destination, days, people, total budget.
-  If something is missing, assume 1 person and say so.
-- Return a small table in ₹ with rows: Travel, Stay, Food, Buffer (~10%), Total.
-- End with one line: "Fits the budget" or "Over by ₹X — <one cheaper option>".
-- Return only the table and that line.
+  Use any prices given in the task; otherwise the skill's typical ranges.
+- Return only the skill's budget table, verdict and assumptions.
 """,
     "tools": [],
+    # Isolated subagents don't inherit the main agent's skills.
+    "skills": ["/skills/"],
 }
 
 CRITIC_AGENT = {
