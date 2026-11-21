@@ -4,6 +4,13 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-21 — B1: weather-agent subagent
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Added `subagents.py` with a `weather-agent` spec (tools=[get_weather]).
+- Passed `subagents=SUBAGENTS` in `agent.py`.
+
 ## 2026-11-20 — A3: AGENTS.md defaults
 
 **Branch:** `deep-agents-project1` · **Status:** committed

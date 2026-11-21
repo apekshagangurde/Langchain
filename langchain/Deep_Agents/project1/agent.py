@@ -10,6 +10,7 @@ Deep agent with:
 - long-term memory: files under /memories/ are saved in the store, shared across threads
 - memory/AGENTS.md: TripMate defaults for all users, loaded on every run
   (per-user details like home city live in /memories/user_preferences.md)
+- subagents from subagents.py (weather-agent), called via the built-in `task` tool
 
     python agent.py
 """
@@ -28,6 +29,7 @@ from langchain.agents.middleware import TodoListMiddleware
 
 from llm import get_model
 from prompts import TRIPMATE_SYSTEM_PROMPT
+from subagents import SUBAGENTS
 from tools import get_weather, search_places
 
 PROJECT_DIR = Path(__file__).parent
@@ -71,6 +73,7 @@ def build_agent(checkpointer=None, store=None):
         backend=backend,
         skills=["/skills/"],
         memory=["/memory/AGENTS.md"],  # always loaded into the system prompt
+        subagents=SUBAGENTS,  # main agent delegates via task(subagent_type=...)
         system_prompt=TRIPMATE_SYSTEM_PROMPT,
         checkpointer=checkpointer,
         store=store,
