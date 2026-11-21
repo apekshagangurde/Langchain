@@ -4,6 +4,14 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-21 — D1–D3: human-in-the-loop booking
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Added fake `book_hotel` tool in `tools.py` and a `## Booking` section in `prompts.py`.
+- Added `interrupt_on` for `book_hotel` (approve / reject) and `pending_booking()` / `resume()` helpers in `agent.py`.
+- Added Approve / Reject buttons for pending bookings in `app.py`.
+
 ## 2026-11-21 — C1: budget-planner skill
 
 **Branch:** `deep-agents-project1` · **Status:** committed

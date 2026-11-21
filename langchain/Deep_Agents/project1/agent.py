@@ -11,6 +11,8 @@ Deep agent with:
 - memory/AGENTS.md: TripMate defaults for all users, loaded on every run
   (per-user details like home city live in /memories/user_preferences.md)
 - subagents from subagents.py (weather, places, budget, critic), called via the built-in `task` tool
+- human-in-the-loop: book_hotel (fake) pauses for approve / reject before it runs;
+  pending_booking() reads the pause, resume() continues with Command(resume=...)
 
     python agent.py
 """
@@ -26,11 +28,12 @@ from deepagents.backends import (
 )
 from dotenv import load_dotenv
 from langchain.agents.middleware import TodoListMiddleware
+from langgraph.types import Command
 
 from llm import get_model
 from prompts import TRIPMATE_SYSTEM_PROMPT
 from subagents import SUBAGENTS
-from tools import get_weather, search_places
+from tools import book_hotel, get_weather, search_places
 
 PROJECT_DIR = Path(__file__).parent
 load_dotenv(PROJECT_DIR / ".env")  # API keys + TRIPMATE_MODEL
@@ -58,6 +61,24 @@ backend = CompositeBackend(
 )
 
 
+def _describe_booking(tool_call, _state, _runtime) -> str:
+    a = tool_call["args"]
+    return (
+        f"Book {a.get('hotel_name')} in {a.get('city')}: check-in {a.get('check_in')}, "
+        f"{a.get('nights', 1)} night(s), {a.get('guests', 2)} guest(s)."
+    )
+
+
+# Human-in-the-loop: the agent pauses before book_hotel runs and waits for a decision.
+# Only approve / reject (no edit) — matches the two buttons in app.py.
+INTERRUPT_ON = {
+    "book_hotel": {
+        "allowed_decisions": ["approve", "reject"],
+        "description": _describe_booking,
+    }
+}
+
+
 def build_agent(checkpointer=None, store=None):
     """Build TripMate.
 
@@ -66,7 +87,7 @@ def build_agent(checkpointer=None, store=None):
     """
     return create_deep_agent(
         model=model,
-        tools=[get_weather, search_places],
+        tools=[get_weather, search_places, book_hotel],
         middleware=[
             TodoListMiddleware()
         ],  # adds the write_todos tool (not default in deepagents 0.7.x)
@@ -74,9 +95,34 @@ def build_agent(checkpointer=None, store=None):
         skills=["/skills/"],
         memory=["/memory/AGENTS.md"],  # always loaded into the system prompt
         subagents=SUBAGENTS,  # main agent delegates via task(subagent_type=...)
+        interrupt_on=INTERRUPT_ON,  # needs a checkpointer to pause and resume
         system_prompt=TRIPMATE_SYSTEM_PROMPT,
         checkpointer=checkpointer,
         store=store,
+    )
+
+
+def pending_booking(result) -> list[dict]:
+    """Bookings waiting for approval, or [] if the run finished.
+
+    When book_hotel is called, invoke() stops early and returns
+    result["__interrupt__"]; its value lists the paused tool calls
+    (each has name, args, description).
+    """
+    interrupts = result.get("__interrupt__") or []
+    return [req for i in interrupts for req in i.value["action_requests"]]
+
+
+def resume(agent, config, approve: bool, n_actions: int = 1, reason: str = ""):
+    """Continue a paused run with the human's decision (one per paused tool call)."""
+    if approve:
+        decision = {"type": "approve"}
+    else:
+        decision = {"type": "reject"}
+        if reason:
+            decision["message"] = reason
+    return agent.invoke(
+        Command(resume={"decisions": [decision] * n_actions}), config=config
     )
 
 

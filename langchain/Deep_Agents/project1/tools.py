@@ -9,9 +9,12 @@ and tested before the next one.
     --------------  ---------------------------------------------
     get_weather     ✅ step 7 — real forecast via Open-Meteo (free, no API key)
     search_places   ✅ step 6 — real web search via Tavily
+    book_hotel      ✅ D1 — FAKE booking (no real hotel is booked); needs human approval (D2)
 
 search_places needs TAVILY_API_KEY in project1/.env (pip install langchain-tavily).
 """
+
+import uuid
 
 import httpx
 from langchain.tools import tool
@@ -138,3 +141,27 @@ def search_places(city: str, interests: str = "") -> str:
         snippet = " ".join(r.get("content", "").split())[:300]
         lines.append(f"- {r.get('title', '')} ({r.get('url', '')})\n  {snippet}")
     return "\n".join(lines)
+
+
+@tool
+def book_hotel(
+    hotel_name: str, city: str, check_in: str, nights: int = 1, guests: int = 2
+) -> str:
+    """Book a hotel room for the user. FAKE: nothing is really booked.
+
+    Only call this when the user has explicitly asked to book. The user must
+    approve the booking before it runs.
+
+    Args:
+        hotel_name: Name of the hotel, e.g. "Hotel Panchgani Heights".
+        city: City or town of the hotel, e.g. "Mahabaleshwar".
+        check_in: Check-in date as YYYY-MM-DD.
+        nights: Number of nights (default 1).
+        guests: Number of guests (default 2).
+    """
+    confirmation_id = "TM-" + uuid.uuid4().hex[:8].upper()
+    return (
+        f"Booked (demo, not a real booking): {hotel_name}, {city}. "
+        f"Check-in {check_in}, {nights} night(s), {guests} guest(s). "
+        f"Confirmation id: {confirmation_id}"
+    )

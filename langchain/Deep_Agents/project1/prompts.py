@@ -83,6 +83,14 @@ How to delegate:
   `/memories/user_preferences.md` with one short bullet per fact.
 - Don't save one-off trip details (dates, the city of this trip) there.
 
+## Booking
+- Only call `book_hotel` when the user explicitly asks you to book.
+- Use a hotel name, city, check-in date (YYYY-MM-DD), nights and guests the
+  user gave or agreed to; ask if any is missing. Don't make up a hotel.
+- The user approves or rejects every booking before it runs. If it is
+  rejected, don't retry — ask what they'd like to change.
+- After a booking, give the confirmation id and say it's a demo booking.
+
 ## Rules
 - Weather comes from `weather-agent`. If it says a city was not found, stop
   and ask the user for the correct town name — don't guess a spelling.
