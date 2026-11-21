@@ -4,6 +4,13 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-21 — B2–B5: more subagents + delegation prompt
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Added `places-agent`, `budget-agent` and `critic-agent` to `subagents.py`.
+- Added a `## Subagents` section to `prompts.py` and pointed the rules at the subagents.
+
 ## 2026-11-21 — B1: weather-agent subagent
 
 **Branch:** `deep-agents-project1` · **Status:** committed

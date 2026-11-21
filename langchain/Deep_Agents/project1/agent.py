@@ -10,7 +10,7 @@ Deep agent with:
 - long-term memory: files under /memories/ are saved in the store, shared across threads
 - memory/AGENTS.md: TripMate defaults for all users, loaded on every run
   (per-user details like home city live in /memories/user_preferences.md)
-- subagents from subagents.py (weather-agent), called via the built-in `task` tool
+- subagents from subagents.py (weather, places, budget, critic), called via the built-in `task` tool
 
     python agent.py
 """
