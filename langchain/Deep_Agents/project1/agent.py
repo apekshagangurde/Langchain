@@ -8,6 +8,8 @@ Deep agent with:
 - skills from project1/skills/ (e.g. itinerary-writer), read only when needed
 - build_agent(checkpointer=..., store=...) for short- and long-term memory (used by app.py)
 - long-term memory: files under /memories/ are saved in the store, shared across threads
+- memory/AGENTS.md: TripMate defaults for all users, loaded on every run
+  (per-user details like home city live in /memories/user_preferences.md)
 
     python agent.py
 """
@@ -46,6 +48,10 @@ backend = CompositeBackend(
         # so they survive across threads (new chats). Everything else stays per-thread.
         # One shared namespace for now; per-user comes with runtime context (E2).
         "/memories/": StoreBackend(namespace=lambda _rt: ("tripmate", "memories")),
+        # Shared defaults: project1/memory/AGENTS.md on disk (you edit it, the agent reads it).
+        "/memory/": FilesystemBackend(
+            root_dir=PROJECT_DIR / "memory", virtual_mode=True
+        ),
     },
 )
 
@@ -64,6 +70,7 @@ def build_agent(checkpointer=None, store=None):
         ],  # adds the write_todos tool (not default in deepagents 0.7.x)
         backend=backend,
         skills=["/skills/"],
+        memory=["/memory/AGENTS.md"],  # always loaded into the system prompt
         system_prompt=TRIPMATE_SYSTEM_PROMPT,
         checkpointer=checkpointer,
         store=store,

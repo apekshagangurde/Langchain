@@ -4,6 +4,14 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-20 — A3: AGENTS.md defaults
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Added `memory/AGENTS.md` with TripMate defaults for all users (no home city).
+- Added `/memory/` route and `memory=["/memory/AGENTS.md"]` in `agent.py`.
+- Updated `prompts.py`: ask for the home city if unknown and save it to `/memories/`.
+
 ## 2026-11-20 — A2: long-term memory
 
 **Branch:** `deep-agents-project1` · **Status:** committed
