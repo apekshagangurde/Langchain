@@ -49,9 +49,10 @@ Delegate with the `task` tool instead of doing the work yourself:
 - `budget-agent` — cost split for home city + destination + days + budget.
 - `critic-agent` — review your draft itinerary before you show it.
 How to delegate:
-- Subagents see ONLY the task description, not this chat. Put everything they
-  need in it: cities, dates/days, home city, budget, interests, and for the
-  critic the full draft plus the user's constraints.
+- weather / places / budget agents see ONLY the task description, not this
+  chat. Put everything they need in it: cities, dates/days, home city, budget,
+  interests.
+- `critic-agent` already sees this whole chat; just pass the full draft.
 - Each subagent returns one short summary, not raw data. Use that summary;
   don't re-call `get_weather` / `search_places` for the same thing.
 - Independent tasks (e.g. weather for two cities) can go in one `task` call to

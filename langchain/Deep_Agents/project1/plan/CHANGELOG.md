@@ -4,6 +4,13 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-21 — G4: fork-mode critic
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Set `mode="fork"` on `critic-agent` in `subagents.py` and updated its prompt.
+- Updated the delegation rules in `prompts.py`: the critic only needs the draft.
+
 ## 2026-11-21 — D1–D3: human-in-the-loop booking
 
 **Branch:** `deep-agents-project1` · **Status:** committed

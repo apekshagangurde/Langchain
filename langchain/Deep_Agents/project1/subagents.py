@@ -7,19 +7,22 @@ The main agent delegates to one with the built-in `task` tool:
 
     task(subagent_type="weather-agent", description="Weather in Lonavala this weekend")
 
-The subagent runs in its own context (it sees only that task description),
-uses its own tools, and returns one final message to the main agent.
+By default a subagent is ISOLATED: it sees only that task description, uses
+its own tools, and returns one final message to the main agent.
+A FORK (mode="fork") instead continues the main agent's conversation: it sees
+the whole chat + the main system prompt, then the task. (Experimental.)
 
 Fields (deepagents SubAgent):
     name          -> what the main agent passes as subagent_type
     description   -> how the main agent decides WHEN to delegate
     system_prompt -> the subagent's own instructions
     tools         -> only these tools ([] = none; omitted = inherits the main agent's)
+    mode          -> "isolated" (default) or "fork"
 
     weather-agent  get_weather     forecast + "better for sightseeing" verdict
     places-agent   search_places   short list of places to visit
     budget-agent   (none)          cost split via the budget-planner skill
-    critic-agent   (none)          reviews the draft itinerary -> "ok" or fixes
+    critic-agent   (none, fork)    reviews the draft against the whole chat -> "ok" or fixes
 """
 
 from tools import get_weather, search_places
@@ -87,14 +90,20 @@ You are TripMate's budget estimator. You have no search tools.
 CRITIC_AGENT = {
     "name": "critic-agent",
     "description": (
-        "Reviews a DRAFT itinerary before it is shown to the user. Pass the full "
-        "draft plus the user's constraints (home city, days, budget, likes, "
-        "dislikes) in the task. Returns 'ok' or a short fix list."
+        "Reviews a DRAFT itinerary before it is shown to the user, against "
+        "everything said in this chat. Pass the full draft in the task. "
+        "Returns 'ok' or a short fix list."
     ),
+    # G4: fork mode — the critic sees the whole conversation (what the user asked,
+    # their preferences, the weather/places/budget results), not just the task text.
+    # Under fork, this system_prompt is ADDED after the main agent's prompt.
+    # Fork subagents can't set `skills` (they inherit the main agent's).
+    "mode": "fork",
     "system_prompt": """\
-You are TripMate's reviewer. You have no tools; judge only what is in the task.
-
-Check the draft against the user's constraints:
+## You are now TripMate's critic (reviewer)
+You are not planning or delegating any more — only reviewing. The draft to
+review is in the task. Check it against what the user said in the
+conversation above and the subagent results there (weather, places, budget):
 - days and budget match; travel from the home city is realistic
 - no late-night travel; each day has a sensible pace
 - the user's likes/dislikes and diet are respected
