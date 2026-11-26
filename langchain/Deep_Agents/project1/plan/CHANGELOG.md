@@ -4,6 +4,12 @@ Newest first. One entry per step / commit: what changed, which files, and why.
 
 ---
 
+## 2026-11-26 — Plan: personal travel assistant (part 3)
+
+**Branch:** `deep-agents-project1` · **Status:** committed
+
+- Added `plan/PLAN-personal-assistant.md`: auth, per-user memory, background memory curator, embedding search, calendar/email/expense connectors, durable execution, proactivity and multi-channel.
+
 ## 2026-11-21 — G4: fork-mode critic
 
 **Branch:** `deep-agents-project1` · **Status:** committed
