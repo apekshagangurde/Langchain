@@ -1,6 +1,6 @@
 # TripMate → Personal Travel Assistant — Plan (part 3)
 
-> Roadmap for the next phase. (`PLAN.md` stays local; this file is committed.)
+> Roadmap for the next phase (part 3). Part 2 is `PLAN.md`.
 
 Goal: turn TripMate from "a chat that plans a trip" into **an assistant that knows each user, remembers their trips, works in the background, acts through real apps (calendar, email, expenses), and reaches out first** when something matters.
 
