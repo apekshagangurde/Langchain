@@ -60,3 +60,6 @@ logs/
 dist/
 build/
 *.egg-info/
+
+# LangGraph dev server local state
+.langgraph_api/
