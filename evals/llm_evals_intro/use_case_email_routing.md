@@ -49,6 +49,8 @@ Now we need **evals** to check it routes emails correctly.
 - **Type of task:** classification
 - **Metric:** accuracy = correct predictions / total emails
 
+Note: an LLM system may have multiple evals, one for each success criterion.
+
 ## Step 3: Build a dataset (golden dataset)
 
 Real email content plus the correct label, checked by a human. This is the **golden dataset**, the "answer key".
